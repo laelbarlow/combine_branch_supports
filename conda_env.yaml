@@ -1,0 +1,10 @@
+name: boots_on_mb
+channels:
+  - bioconda
+  - conda-forge
+  - etetoolkit
+dependencies:
+  - python=3.10
+  - pytest
+  - raxml
+  - ete3
