@@ -19,13 +19,52 @@ import time
 from ete3 import Tree
 
 
+def resolve_polytomies(tree_string):
+    """
+    Takes a newick tree string and returns a newick tree string with all polytomies resolved.
+    """
+    t = Tree(tree_string)
+
+    # Iterate over all nodes in the tree.
+    print('Before resolving polytomies:')
+    for node in t.traverse():
+        # Ignore the root node.
+        if node.is_root():
+            continue
+        # Ignore leaf nodes.
+        if node.is_leaf():
+            continue
+        # Print the node support value.
+        print(node.support)
+
+    t.resolve_polytomy()
+
+    # Iterate over all nodes in the tree.
+    print('After resolving polytomies:')
+    for node in t.traverse():
+        # Ignore the root node.
+        if node.is_root():
+            continue
+        # Ignore leaf nodes.
+        if node.is_leaf():
+            continue
+        # Print the node support value.
+        print(node.support)
+
+    return t.write(format=0)
+
+
 def reformat_combined_supports(tree_string):
+    print()
+    print(tree_string)
+    print()
     cs = re.compile(r'\)\d+:')
     inum = 0
     for instance in cs.findall(tree_string):
         inum += 1
         # Define a reformatted support string.
         supcomb = str(int(float(instance[1:-1])))
+        print(supcomb)
         supcomb2 = ''
 
         if supcomb == '0':
@@ -171,9 +210,15 @@ def mbcontre_to_newick_w_probs(intreepath, outtreepath):
         repl = '{:.7f}'.format(float(numx))
         intreestring5 = intreestring5.replace(numx, repl)
 
+
+    # Randomly resolve polytomies.
+    print('This is mbcontre_to_newick_w_probs')
+    print('Resolving polytomies in {}...'.format(intreepath))
+    intreestring6 = resolve_polytomies(intreestring5)
+
     # Write final tree string to output file.
     with open(outtreepath, 'w') as o:
-        o.write(intreestring5)
+        o.write(intreestring6)
 
 
 def mb_contre_to_newick(intreepath, outtreepath):
@@ -227,10 +272,24 @@ def mb_contre_to_newick(intreepath, outtreepath):
         numx = num.strip(':')
         repl = '{:.7f}'.format(float(numx))
         intreestring5 = intreestring5.replace(numx, repl)
-    
+
+    # Randomly resolve polytomies.
+    print('This is mb_contre_to_newick')
+    print('Resolving polytomies in {}...'.format(intreepath))
+    intreestring6 = resolve_polytomies(intreestring5)
+
+    # Parse the tree string using ete3 again.
+    tx = Tree(intreestring6)
+    # Iterate over all nodes in the tree, ignoring leaf nodes.
+    for node in tx.traverse():
+        if not node.is_leaf():
+            if node.support != 1.0:
+                node.support = 1.0
+    intreestring6 = tx.write(format=0)
+
     # Write final tree string to output file.
     with open(outtreepath, 'w') as o:
-        o.write(intreestring5)
+        o.write(intreestring6)
 
 
 if __name__=='__main__':
