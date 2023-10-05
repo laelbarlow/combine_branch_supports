@@ -73,7 +73,7 @@ def reformat_combined_supports(tree_string):
             boot = supcomb[-3:].lstrip("0")
             if boot == "":
                 boot = "0"
-            prob = str(int(supcomb[:-3]) / 100)
+            prob = str(int([supcomb[:-3] if supcomb[:-3] != "" else "0"][0]) / 100)
 
             supcomb2 = prob + "/" + boot
 
