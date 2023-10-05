@@ -1,7 +1,7 @@
 name: boots_on_mb
 channels:
-  - bioconda
   - conda-forge
+  - bioconda
   - etetoolkit
 dependencies:
   - python=3.10
